@@ -465,7 +465,7 @@ CELERY_RESULT_BACKEND = None  # task results are stored internally
 CELERYBEAT_SCHEDULE = {
     'message-pull': {
         'task': 'dash.orgs.tasks.trigger_org_task',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(seconds=20),
         'args': ('casepro.msgs.tasks.pull_messages', 'sync')
     },
     'contact-pull': {
