@@ -318,6 +318,8 @@ class Message(models.Model):
 
     created_on = models.DateTimeField()
 
+    inserted_on = models.DateTimeField(auto_now_add=True)
+
     modified_on = models.DateTimeField(null=True, help_text="When message was last modified")
 
     is_handled = models.BooleanField(default=False)

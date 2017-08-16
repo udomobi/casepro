@@ -281,7 +281,7 @@ class Case(models.Model):
         local_outgoing = self.outgoing_messages.filter(created_on__gte=after, created_on__lte=before)
         local_outgoing = local_outgoing.select_related('case', 'contact', 'created_by').order_by('-created_on')
 
-        local_incoming = self.incoming_messages.filter(created_on__gte=after, created_on__lte=before)
+        local_incoming = self.incoming_messages.filter(inserted_on__gte=after, inserted_on__lte=before)
         local_incoming = local_incoming.select_related('case', 'contact').prefetch_related('labels')
         local_incoming = local_incoming.order_by('-created_on')
 
