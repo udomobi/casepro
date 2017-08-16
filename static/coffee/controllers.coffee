@@ -7,7 +7,7 @@ controllers = angular.module('cases.controllers', ['cases.services', 'cases.moda
 
 # Component refresh intervals
 INTERVAL_CASE_INFO = 30000
-INTERVAL_CASE_TIMELINE = 30000
+INTERVAL_CASE_TIMELINE = 10000
 INTERVAL_ITEM_REFRESH = 10000
 
 INFINITE_SCROLL_MAX_ITEMS = 1000
