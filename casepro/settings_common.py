@@ -475,7 +475,7 @@ CELERYBEAT_SCHEDULE = {
     },
     'message-handle': {
         'task': 'dash.orgs.tasks.trigger_org_task',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(seconds=20),
         'args': ('casepro.msgs.tasks.handle_messages', 'sync')
     },
     'squash-counts': {
