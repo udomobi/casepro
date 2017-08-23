@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import django.utils.timezone
 
 
 def populate_inserted_on(apps, schema_editor):
@@ -28,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='message',
             name='inserted_on',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now)
+            field=models.DateTimeField(auto_now_add=True)
         ),
         migrations.RunPython(populate_inserted_on)
     ]
