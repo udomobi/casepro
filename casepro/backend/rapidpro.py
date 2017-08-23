@@ -167,7 +167,7 @@ class MessageSyncer(BaseSyncer):
             'is_flagged': remote_message_is_flagged(remote),
             'is_archived': remote_message_is_archived(remote),
             'created_on': remote.created_on,
-            'inserted_on': remote.inserted_on,
+            'inserted_on': now(),
             Message.SAVE_CONTACT_ATTR: (remote.contact.uuid, remote.contact.name),
             Message.SAVE_LABELS_ATTR: labels,
         }
