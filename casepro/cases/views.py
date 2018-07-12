@@ -75,6 +75,7 @@ class CaseCRUDL(SmartCRUDL):
         "label",
         "watch",
         "unwatch",
+        "upload",
     )
 
     class Read(OrgObjPermsMixin, SmartReadView):
@@ -343,6 +344,32 @@ class CaseCRUDL(SmartCRUDL):
 
         def post(self, request, *args, **kwargs):
             self.get_object().unwatch(request.user)
+            return HttpResponse(status=204)
+
+    class Upload(OrgObjPermsMixin, SmartCreateView):
+        """
+        Endpoint for upload file to Amazon S3
+        """
+        permission = "cases.case_read"
+
+        def post(self, request, *args, **kwargs):
+            import uuid
+            from boto.s3.connection import S3Connection
+            from boto.s3.key import Key
+
+            file = self.request.FILES["file"]
+            if file:
+                connection = S3Connection(settings.AWS_ACCESS_KEY, settings.AWS_SECRET_ACCESS_KEY)
+                bucket = connection.get_bucket(settings.AWS_S3_BUCKET)
+
+                extension = str(file.name).lower().split(".")[-1]
+                file_uuid = uuid.uuid5(uuid.NAMESPACE_OID, file.name)
+                key = Key(bucket, '{}/{}.{}'.format(self.request.org.subdomain, file_uuid, extension))
+
+                if key.set_contents_from_file(file):
+                    url = key.generate_url(expires_in=0, query_auth=False)
+                    return HttpResponse(url, status=200)
+
             return HttpResponse(status=204)
 
 

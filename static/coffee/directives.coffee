@@ -139,3 +139,18 @@ directives.directive('cpUrn', () ->
     ]
   }
 )
+
+#----------------------------------------------------------------------------
+# Messaging
+#----------------------------------------------------------------------------
+directives.directive('fileOnChange', () ->
+  return {
+    restrict: 'A',
+    link: (scope, element, attrs) ->
+      onChangeHandler = scope.$eval(attrs.fileOnChange)
+      element.on('change', onChangeHandler)
+      element.on('$destroy', () ->
+        element.off()
+      )
+  }
+)

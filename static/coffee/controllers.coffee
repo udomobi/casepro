@@ -663,6 +663,8 @@ controllers.controller('CaseController', ['$scope', '$window', '$timeout', 'Case
   $scope.contact = null
   $scope.newMessage = ''
   $scope.sending = false
+  $scope.fileToUpload = null
+  $scope.uploadInProgress = false
 
   $scope.alerts = []
 
@@ -726,6 +728,20 @@ controllers.controller('CaseController', ['$scope', '$window', '$timeout', 'Case
 
   $scope.onNewMessageChanged = ->
     $scope.msgCharsRemaining = $scope.maxMsgChars - $scope.newMessage.length
+
+  $scope.uploadFile = (e)->
+    e.stopPropagation()
+    e.preventDefault()
+    file = e.target.files || e.dataTransfer.files
+
+    $scope.uploadInProgress = true
+    $fileToUpload = null
+
+    CaseService.uploadFile(file[0]).then((response) ->
+      $scope.uploadInProgress = false
+      if response
+        $scope.newMessage = $scope.newMessage + " " + response
+    )
 
   #----------------------------------------------------------------------------
   # Case actions

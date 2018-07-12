@@ -79,8 +79,14 @@
           .sendform-controls.clearfix
             %button.btn.btn-default.pull-right{ type:"button", ng-click:"sendMessage()", ng-disabled:"sending || $parent.newMessage.length == 0 || msgCharsRemaining < 0" }
               - trans "Send"
+            %span.pull-right{ style:"height: 32px;" }
+              %label.write-link
+                %i.glyphicon.glyphicon-paperclip{ ng-show:"$parent.uploadInProgress == false" }
+                  %input.box-input{ type:"file", name:"upload", ng-model:"fileToUpload", file-on-change:"uploadFile" }
+                %i.glyphicon.glyphicon-upload{ ng-show:"$parent.uploadInProgress == true" }
             %span.pull-right.chars-left
               [[ msgCharsRemaining ]]
+            
 
         .timeline{ ng-controller:"CaseTimelineController", ng-init:"init()" }
           .timeline-event.clearfix{ ng-repeat:"event in timeline | reverse", ng-class:'{ "timeline-action": (event.type == "A"), "timeline-incoming": (event.type == "I"), "timeline-outgoing": (event.type == "O") }' }
@@ -284,4 +290,25 @@
     }
     .contact-field-label {
       font-weight: bold;
+    }
+    .box-input {
+      z-index: 999;
+      line-height: 0;
+      font-size: 50px;
+      position: absolute;
+      top: -2px;
+      left: -700px;
+      opacity: 0;
+      margin: 0;
+      padding:0;
+    }
+    .write-link {
+      width: 45px;
+      height: 32px;
+      overflow: hidden;
+      margin-bottom: 0px;
+    }
+    .write-link i {
+      padding-top: 8px;
+      cursor: pointer;
     }
