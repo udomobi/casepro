@@ -462,6 +462,25 @@ services.factory('CaseService', ['$http', '$httpParamSerializer', '$window', ($h
       )
 
     #----------------------------------------------------------------------------
+    # Send file to S3
+    #----------------------------------------------------------------------------
+    uploadFile: (file) ->
+      formdata = new FormData()
+      formdata.append('file', file)
+
+      request = {
+        'url': '/case/upload/',
+        'method': 'POST',
+        'data': formdata,
+        'headers': {
+          'Content-Type' : undefined
+        }
+      }
+      return $http(request).then((response) -> 
+        return response.data
+      )
+
+    #----------------------------------------------------------------------------
     # Convert search object to URL params
     #----------------------------------------------------------------------------
     _searchToParams: (search) ->
