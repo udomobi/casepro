@@ -72,6 +72,7 @@ controllers.controller('InboxController', ['$scope', '$window', '$location', 'La
     ModalService.createCase({
       title: "Open Case"
     }).then((result) ->
+      console.log(result)
       CaseService.open(null, result.text, result.partner, result.user, result.urn).then((caseObj) ->
         caseUrl = 'case/read/' + caseObj.id + '/'
         if !caseObj.is_new

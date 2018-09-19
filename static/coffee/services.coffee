@@ -721,7 +721,7 @@ services.factory('ModalService', ['$rootScope', '$uibModal', ($rootScope, $uibMo
       templateUrl = '/sitestatic/templates/modals/create_case.html',
       initial='',
       maxLength=255,
-      schemes = {tel: "Phone", twitter: "Twitter", email: "Email"},
+      schemes = {tel: "Phone", twitter: "Twitter", mailto: "Email"},
     } = {}) ->
       $uibModal.open({
         templateUrl,

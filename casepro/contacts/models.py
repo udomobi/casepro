@@ -317,8 +317,11 @@ class Contact(models.Model):
         if not contact:
             URN.validate(normalized_urn)
 
-            contact = cls.objects.create(org=org, name=name, urns=[normalized_urn], is_stub=False)
-            org.get_backend().push_contact(org, contact)
+            contact = cls.objects.create(org=org, name='AAAAA', urns=['email:edu.douglas@ilhasoft.com.br'], is_stub=False)
+            print(org)
+            print(normalized_urn)
+            print(contact)
+            # org.get_backend().push_contact(org, contact)
         return contact
 
     @classmethod
