@@ -268,6 +268,9 @@ class Case(models.Model):
                 case.is_new = False
                 return case
 
+            # get active messages from contacts
+            messages = list(contact.incoming_messages.filter(is_archived=False))
+
             # suspend from groups, expire flows and archive messages
             contact.prepare_for_case()
 
@@ -280,12 +283,18 @@ class Case(models.Model):
                 user_assignee=user_assignee,
             )
 
-            if message:
-                case.labels.add(*list(message.labels.all()))  # copy labels from message to new case
+            def update_message_case(_message, _case):
+                _case.labels.add(*list(_message.labels.all()))  # copy labels from message to new case
 
                 # attach message to this case
-                message.case = case
-                message.save(update_fields=("case",))
+                _message.case = _case
+                _message.save(update_fields=("case",))
+
+            if message:
+                update_message_case(message, case)
+
+            for _message in messages:
+                update_message_case(_message, case)
 
             case.is_new = True
             case.watchers.add(user)
