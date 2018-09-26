@@ -379,6 +379,7 @@ class CaseCRUDL(SmartCRUDL):
                 key = Key(bucket, '{}/{}.{}'.format(self.request.org.subdomain, file_uuid, extension))
 
                 if key.set_contents_from_file(file):
+                    key.make_public()
                     url = key.generate_url(expires_in=0, query_auth=False)
                     return HttpResponse(url, status=200)
 
