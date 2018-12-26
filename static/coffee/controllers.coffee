@@ -803,7 +803,6 @@ controllers.controller('CaseTimelineController', ['$scope', '$timeout', 'CaseSer
       $scope.refreshItems(false)
     )
 
-    $scope.refreshItems(false)
     $scope.refreshItems(true)
 
   $scope.refreshItems = (repeat) ->
