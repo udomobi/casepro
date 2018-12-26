@@ -803,13 +803,18 @@ controllers.controller('CaseTimelineController', ['$scope', '$timeout', 'CaseSer
       $scope.refreshItems(false)
     )
 
+    $scope.refreshItems(false)
     $scope.refreshItems(true)
 
   $scope.refreshItems = (repeat) ->
 
     CaseService.fetchTimeline({id: $scope.caseId}, $scope.itemsMaxTime).then((data) ->
-      $scope.timeline = $scope.timeline.concat(data.results)
       $scope.itemsMaxTime = data.maxTime
+
+      data.results.forEach((item) ->
+        if !_.find($scope.timeline, item)
+          $scope.timeline.push(item)
+      )
 
       if repeat
         $timeout((() -> $scope.refreshItems(true)), INTERVAL_CASE_TIMELINE)
