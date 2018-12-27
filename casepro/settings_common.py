@@ -190,6 +190,7 @@ INSTALLED_APPS = (
     "casepro.cases",
     "casepro.statistics",
     "casepro.api",
+    "casepro.short_urls",
 )
 
 COMMENTS_APP = "casepro.msg_board"
