@@ -733,14 +733,21 @@ controllers.controller('CaseController', ['$scope', '$window', '$timeout', 'Case
     e.stopPropagation()
     e.preventDefault()
     file = e.target.files || e.dataTransfer.files
+    file = file[0]
+
+    if file.size > 20971520
+      UtilsService.displayAlert('error', 'Arquivo muito grande. O máximo permitido é 20MB.')
+      return
 
     $scope.uploadInProgress = true
     $fileToUpload = null
 
-    CaseService.uploadFile(file[0]).then((response) ->
+    CaseService.uploadFile(file).then((response) ->
       $scope.uploadInProgress = false
-      if response
-        $scope.newMessage = $scope.newMessage + " " + response
+      $scope.newMessage = $scope.newMessage + " " + response.data
+    ).catch((error) ->
+      $scope.uploadInProgress = false
+      UtilsService.displayAlert('error', error.data)
     )
 
   #----------------------------------------------------------------------------

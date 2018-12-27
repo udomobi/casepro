@@ -369,13 +369,16 @@ class CaseCRUDL(SmartCRUDL):
             from boto.s3.connection import S3Connection
             from boto.s3.key import Key
 
-            file = self.request.FILES["file"]
+            file = self.request.FILES.get("file")
             if file:
+                if file.size > 20971520:  # 20MB
+                    return HttpResponse(_('File too large. Maximum is 20MB.'), status=400)
+
                 connection = S3Connection(settings.AWS_ACCESS_KEY, settings.AWS_SECRET_ACCESS_KEY)
                 bucket = connection.get_bucket(settings.AWS_S3_BUCKET)
 
                 extension = str(file.name).lower().split(".")[-1]
-                file_uuid = uuid.uuid5(uuid.NAMESPACE_OID, file.name)
+                file_uuid = uuid.uuid4()
                 key = Key(bucket, '{}/{}.{}'.format(self.request.org.subdomain, file_uuid, extension))
 
                 if key.set_contents_from_file(file):
