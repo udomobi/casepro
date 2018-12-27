@@ -476,9 +476,7 @@ services.factory('CaseService', ['$http', '$httpParamSerializer', '$window', ($h
           'Content-Type' : undefined
         }
       }
-      return $http(request).then((response) -> 
-        return response.data
-      )
+      return $http(request)
 
     #----------------------------------------------------------------------------
     # Convert search object to URL params

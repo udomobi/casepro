@@ -152,5 +152,8 @@ directives.directive('fileOnChange', () ->
       element.on('$destroy', () ->
         element.off()
       )
+      element.bind('click', () ->
+      	element.val('');
+      )
   }
 )
