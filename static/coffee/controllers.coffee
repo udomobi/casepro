@@ -812,6 +812,10 @@ controllers.controller('CaseTimelineController', ['$scope', '$timeout', 'CaseSer
 
     $scope.refreshItems(true)
 
+  $scope.sortTimeline = (item) ->
+    date = new Date(item.time)
+    return date
+
   $scope.refreshItems = (repeat) ->
 
     CaseService.fetchTimeline({id: $scope.caseId}, $scope.itemsMaxTime).then((data) ->
@@ -819,7 +823,7 @@ controllers.controller('CaseTimelineController', ['$scope', '$timeout', 'CaseSer
 
       data.results.forEach((item) ->
         if !_.find($scope.timeline, item)
-          $scope.timeline.push(item)
+          $scope.timeline = $scope.timeline.concat(item)
       )
 
       if repeat

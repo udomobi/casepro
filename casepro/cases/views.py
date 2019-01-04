@@ -330,7 +330,7 @@ class CaseCRUDL(SmartCRUDL):
             timeline = self.object.get_timeline(after, before, merge_from_backend) if not empty else []
 
             context["timeline"] = timeline
-            context["max_time"] = datetime_to_microseconds(dt_now)
+            context["max_time"] = datetime_to_microseconds(dt_now) - 180000000  # -3 minutes
             return context
 
         def render_to_response(self, context, **response_kwargs):
