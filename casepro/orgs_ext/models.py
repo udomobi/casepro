@@ -1,9 +1,12 @@
 import json
 
-from dash.orgs.models import Org
+from dash.orgs.models import Org, OrgBackend
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from celery import signature
 
 ORG_CACHE_TTL = 60 * 60 * 24 * 7  # 1 week
 ORG_CONFIG_BANNER_TEXT = "banner_text"
@@ -62,3 +65,15 @@ Org.set_banner_text = _org_set_banner_text
 Org.get_followup_flow = _org_get_followup_flow
 Org.set_followup_flow = _org_set_followup_flow
 Org.make_absolute_url = _org_make_absolute_url
+
+
+@receiver(post_save, sender=OrgBackend)
+def my_handler(sender, instance, created, **kwargs):
+    if created:
+        instance.org.get_task_state('message-handle')
+        instance.org.get_task_state('message-pull')
+        instance.org.get_task_state('contact-pull')
+
+        signature('casepro.msgs.tasks.pull_messages', args=[instance.org.pk]).apply_async(queue='sync')
+        signature('casepro.contacts.tasks.pull_contact', args=[instance.org.pk]).apply_async(queue='sync')
+        signature('casepro.msgs.tasks.handle_messages', args=[instance.org.pk]).apply_async(queue='sync')
