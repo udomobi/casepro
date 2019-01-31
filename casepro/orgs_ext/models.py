@@ -68,7 +68,7 @@ Org.make_absolute_url = _org_make_absolute_url
 
 
 @receiver(post_save, sender=OrgBackend)
-def my_handler(sender, instance, created, **kwargs):
+def org_tasks_signal(sender, instance, created, **kwargs):
     if created:
         instance.org.get_task_state('message-handle')
         instance.org.get_task_state('message-pull')
