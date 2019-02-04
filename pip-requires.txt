@@ -27,12 +27,14 @@ pisa
 psycopg2
 pycountry
 python-dateutil
+python-decouple
 rapidpro-dash
 rapidpro-python
 raven
 redis
 regex
 sorl-thumbnail
+short-url
 xlutils
 
 ############## Testing ##############
