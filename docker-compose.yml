@@ -20,7 +20,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-inbox}
       - POSTGRES_DB=${POSTGRES_DB:-inbox}
   inbox:
-    image: ${DOCKER_IMAGE_NAME:-ilha/inbox}:${TAG:-latest}
+    image: ${DOCKER_IMAGE_NAME:-ilha/inbox}:${DOCKER_IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
@@ -45,7 +45,7 @@ services:
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
       - EMAIL_USE_SSL=${EMAIL_USE_SSL:-false}
       - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
-      - ADMINS=${ADMINS}
+      - ADMINS=${ADMINS:-Ilhasoft|contato@ilhasoft.com.br}
       - SEND_EMAILS=${SEND_EMAILS:-true}
       - COMPRESS_ENABLED=${DEBUG:-false}
       - COMPRESS_OFFLINE=${DEBUG:-false}
