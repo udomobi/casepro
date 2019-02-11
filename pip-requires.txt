@@ -35,6 +35,7 @@ redis
 regex
 sorl-thumbnail
 short-url
+whitenoise
 xlutils
 
 ############## Testing ##############
