@@ -49,6 +49,10 @@ services:
       - SEND_EMAILS=${SEND_EMAILS:-true}
       - COMPRESS_ENABLED=${DEBUG:-false}
       - COMPRESS_OFFLINE=${DEBUG:-false}
+      - RAVEN_CONFIG=${RAVEN_CONFIG}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_ACCESS_KEY}
     depends_on:
       - database
       - redis
