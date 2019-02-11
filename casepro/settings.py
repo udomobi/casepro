@@ -73,6 +73,7 @@ RAVEN_CONFIG = {
 AWS_ACCESS_KEY = config('AWS_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_S3_BUCKET = config('AWS_S3_BUCKET')
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 COMPRESS_ENABLED = config('COMPRESS_ENABLED', default=True, cast=bool)
 COMPRESS_OFFLINE = config('COMPRESS_OFFLINE', default=True, cast=bool)
