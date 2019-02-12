@@ -47,8 +47,8 @@ services:
       - EMAIL_USE_TLS=${EMAIL_USE_TLS:-false}
       - ADMINS=${ADMINS:-Ilhasoft|contato@ilhasoft.com.br}
       - SEND_EMAILS=${SEND_EMAILS:-true}
-      - COMPRESS_ENABLED=${DEBUG:-false}
-      - COMPRESS_OFFLINE=${DEBUG:-false}
+      - COMPRESS_ENABLED=${COMPRESS_ENABLED:-false}
+      - COMPRESS_OFFLINE=${COMPRESS_OFFLINE:-false}
       - RAVEN_CONFIG=${RAVEN_CONFIG}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
