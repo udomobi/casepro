@@ -37,7 +37,7 @@ ADMINS = config('ADMINS',
 
 HOSTNAME = config('HOSTNAME', default='inbox.push.al')
 SITE_API_HOST = config('SITE_API_HOST', default='https://push.ilhasoft.mobi/')
-SITE_HOST_PATTERN = 'http://%s.inbox.push.al'
+SITE_HOST_PATTERN = config('SITE_HOST_PATTERN', default='http://%s.inbox.push.al')
 
 SITE_EXTERNAL_CONTACT_URL = config(
     'SITE_EXTERNAL_CONTACT_URL', default='https://push.ilhasoft.mobi/contact/read/%s/')

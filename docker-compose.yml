@@ -33,6 +33,9 @@ services:
     environment:
       - DEBUG=${DEBUG:-true}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+      - HOSTNAME = ${HOSTNAME:-localhost}
+      - SITE_API_HOST = ${SITE_API_HOST:-http://localhost}
+      - SITE_HOST_PATTERN = ${SITE_HOST_PATTERN:-http://%s.localhost}
       - DEFAULT_DATABASE=${DEFAULT_DATABASE:-postgres://inbox:inbox@database:5432/inbox}
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_DATABASE=${REDIS_DATABASE:-15}
