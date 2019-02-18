@@ -37,6 +37,7 @@ regex
 sentry-sdk
 sorl-thumbnail
 short-url
+SQLAlchemy
 whitenoise
 xlutils
 

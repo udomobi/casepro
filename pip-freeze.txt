@@ -65,6 +65,7 @@ short-url==1.2.2
 six==1.11.0               # via django-hamlpy, django-rosetta, python-dateutil, rapidpro-python, responses
 smartmin==2.0.0
 sorl-thumbnail==12.4.1
+SQLAlchemy==1.2.18
 sqlparse==0.2.4           # via smartmin
 urllib3==1.23             # via requests
 vine==1.1.4               # via amqp
