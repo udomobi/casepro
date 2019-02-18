@@ -28,7 +28,6 @@ psycopg2
 pycountry
 python-dateutil
 python-decouple
-python-memcached
 rapidpro-dash
 rapidpro-python
 raven
