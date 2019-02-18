@@ -64,6 +64,8 @@ CACHES = {
 }
 
 BROKER_URL = config('CELERY_BROKER_URL', '')
+BROKER_POOL_LIMIT = None
+
 CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
 CELERY_RESULT_BACKEND = 'db+sqlite:///celery-results.db'
 CELERY_RESULT_PERSISTENT = False
