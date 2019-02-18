@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 import os
 import dj_database_url
+import sentry_sdk
 
+from sentry_sdk.integrations.django import DjangoIntegration
 from decouple import config
 
 # import our default settings
@@ -51,24 +53,22 @@ DATABASES['default'] = dj_database_url.parse(
 REDIS_HOST = config('REDIS_HOST')
 REDIS_DATABASE = config('REDIS_DATABASE')
 
-CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
-BROKER_URL = 'redis://{}:6379/{}'.format(REDIS_HOST, REDIS_DATABASE)
-
 CACHES = {
     'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': BROKER_URL,
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 
-CELERY_RESULT_BACKEND = BROKER_URL
+BROKER_URL = config('CELERY_BROKER_URL', '')
+CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
+CELERY_RESULT_BACKEND = 'db+sqlite:///celery-results.db'
+CELERY_RESULT_PERSISTENT = False
 
-RAVEN_CONFIG = {
-    'dsn': config('RAVEN_CONFIG', default=''),
-}
+sentry_sdk.init(
+    dsn=config('RAVEN_CONFIG', default=''),
+    integrations=[DjangoIntegration()]
+)
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')

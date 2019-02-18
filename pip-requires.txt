@@ -28,11 +28,13 @@ psycopg2
 pycountry
 python-dateutil
 python-decouple
+python-memcached
 rapidpro-dash
 rapidpro-python
 raven
 redis
 regex
+sentry-sdk
 sorl-thumbnail
 short-url
 whitenoise

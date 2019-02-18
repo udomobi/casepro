@@ -6,7 +6,7 @@ WORKDIR $WORKDIR
 RUN apk add --no-cache varnish wget gettext git
 RUN apk add --no-cache jpeg-dev zlib-dev
 RUN apk add --no-cache postgresql-dev nodejs nodejs-npm
-RUN apk add --no-cache supervisor
+RUN apk add --no-cache supervisor memcached
 
 COPY varnish.default.vcl /etc/varnish/default.vcl
 COPY pip-freeze.txt .

@@ -49,8 +49,9 @@ pycountry==18.5.26
 pyflakes==1.6.0           # via flake8
 python-dateutil==2.7.3
 python-decouple==3.1
+python-memcached==1.59
 pytz==2018.5              # via celery, django, django-timezone-field, rapidpro-python, smartmin
-rapidpro-dash==1.4
+rapidpro-dash==1.4.5
 rapidpro-python==2.4
 raven==6.9.0
 rcssmin==1.0.6            # via django-compressor
@@ -59,6 +60,7 @@ regex==2018.7.11
 requests==2.19.1          # via django-rosetta, rapidpro-dash, rapidpro-python, responses
 responses==0.9.0
 rjsmin==1.0.12            # via django-compressor
+sentry-sdk==0.7.2
 short-url==1.2.2
 six==1.11.0               # via django-hamlpy, django-rosetta, python-dateutil, rapidpro-python, responses
 smartmin==2.0.0
