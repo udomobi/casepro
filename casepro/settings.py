@@ -64,7 +64,7 @@ CACHES = {
 }
 
 BROKER_URL = config('CELERY_BROKER_URL', '')
-BROKER_POOL_LIMIT = 5
+BROKER_POOL_LIMIT = None
 
 CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
 CELERY_RESULT_BACKEND = 'db+sqlite:///celery-results.db'
@@ -93,3 +93,23 @@ COMPRESS_CSS_FILTERS = [
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
 TIME_ZONE = config('TIME_ZONE', default='UTC')
+
+CELERYBEAT_SCHEDULE = {
+    "message-pull": {
+        "task": "dash.orgs.tasks.trigger_org_task",
+        "schedule": timedelta(seconds=20),
+        "args": ("casepro.msgs.tasks.pull_messages", "celery"),
+    },
+    "contact-pull": {
+        "task": "dash.orgs.tasks.trigger_org_task",
+        "schedule": timedelta(minutes=3),
+        "args": ("casepro.contacts.tasks.pull_contacts", "celery"),
+    },
+    "message-handle": {
+        "task": "dash.orgs.tasks.trigger_org_task",
+        "schedule": timedelta(seconds=5),
+        "args": ("casepro.msgs.tasks.handle_messages", "celery"),
+    },
+    "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
+    "send-notifications": {"task": "casepro.profiles.tasks.send_notifications", "schedule": timedelta(minutes=1)},
+}
