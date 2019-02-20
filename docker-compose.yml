@@ -40,7 +40,6 @@ services:
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_DATABASE=${REDIS_DATABASE:-15}
       - TIME_ZONE=${TIME_ZONE:-UTC}
-      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - EMAIL_HOST=${EMAIL_HOST}
       - EMAIL_PORT=${EMAIL_PORT:-587}
       - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL:-webmaster@localhost}
