@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import urllib
 import dj_database_url
 import sentry_sdk
 
@@ -39,7 +40,8 @@ ADMINS = config('ADMINS',
 
 HOSTNAME = config('HOSTNAME', default='inbox.push.al')
 SITE_API_HOST = config('SITE_API_HOST', default='https://push.ilhasoft.mobi/')
-SITE_HOST_PATTERN = config('SITE_HOST_PATTERN', default='http://%s.inbox.push.al')
+SITE_HOST_PATTERN = config(
+    'SITE_HOST_PATTERN', default='http://%s.inbox.push.al')
 
 SITE_EXTERNAL_CONTACT_URL = config(
     'SITE_EXTERNAL_CONTACT_URL', default='https://push.ilhasoft.mobi/contact/read/%s/')
@@ -63,25 +65,37 @@ CACHES = {
     }
 }
 
-BROKER_URL = config('CELERY_BROKER_URL', '')
-BROKER_POOL_LIMIT = None
-
-CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
-CELERY_RESULT_BACKEND = 'db+sqlite:///celery-results.db'
-CELERY_RESULT_PERSISTENT = False
-
 sentry_sdk.init(
     dsn=config('RAVEN_CONFIG', default=''),
     integrations=[DjangoIntegration()]
 )
 
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='', cast=str)
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='', cast=str)
+AWS_STORAGE_BUCKET_NAME = config(
+    'AWS_STORAGE_BUCKET_NAME', default='', cast=str)
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = ''
+
+BROKER_URL = "sqs://{}:{}@".format(urllib.parse.quote(
+    AWS_ACCESS_KEY_ID, safe=''), urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=''))
+
+BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-east-1',
+    'polling_interval': 20,
+    'visibility_timeout': 3600,
+    'queue_name_prefix': 'inbox-'
+}
+
+CELERY_ACCEPT_CONTENT = ['application/json', 'application/x-python-serialize']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
+CELERY_RESULT_BACKEND = None
+CELERY_RESULT_PERSISTENT = False
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
@@ -93,23 +107,3 @@ COMPRESS_CSS_FILTERS = [
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
 TIME_ZONE = config('TIME_ZONE', default='UTC')
-
-CELERYBEAT_SCHEDULE = {
-    "message-pull": {
-        "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=20),
-        "args": ("casepro.msgs.tasks.pull_messages", "celery"),
-    },
-    "contact-pull": {
-        "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(minutes=3),
-        "args": ("casepro.contacts.tasks.pull_contacts", "celery"),
-    },
-    "message-handle": {
-        "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=5),
-        "args": ("casepro.msgs.tasks.handle_messages", "celery"),
-    },
-    "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
-    "send-notifications": {"task": "casepro.profiles.tasks.send_notifications", "schedule": timedelta(minutes=1)},
-}

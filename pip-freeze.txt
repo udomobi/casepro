@@ -8,7 +8,8 @@
 amqp==2.3.2               # via kombu
 billiard==3.5.0.4         # via celery
 boto==2.49.0
-celery==4.2.1
+boto3==1.9.98
+celery[sqs]==4.2.1
 certifi==2018.8.13        # via requests
 chardet==3.0.4            # via requests
 colorama==0.3.9
