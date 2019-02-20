@@ -40,7 +40,8 @@ ADMINS = config('ADMINS',
 
 HOSTNAME = config('HOSTNAME', default='inbox.push.al')
 SITE_API_HOST = config('SITE_API_HOST', default='https://push.ilhasoft.mobi/')
-SITE_HOST_PATTERN = config('SITE_HOST_PATTERN', default='http://%s.inbox.push.al')
+SITE_HOST_PATTERN = config(
+    'SITE_HOST_PATTERN', default='http://%s.inbox.push.al')
 
 SITE_EXTERNAL_CONTACT_URL = config(
     'SITE_EXTERNAL_CONTACT_URL', default='https://push.ilhasoft.mobi/contact/read/%s/')
@@ -71,15 +72,15 @@ sentry_sdk.init(
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='', cast=str)
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='', cast=str)
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='', cast=str)
+AWS_STORAGE_BUCKET_NAME = config(
+    'AWS_STORAGE_BUCKET_NAME', default='', cast=str)
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = ''
 
-# BROKER_URL = config('CELERY_BROKER_URL', '')
-
-BROKER_URL = "sqs://{}:{}@".format(urllib.parse.quote(AWS_ACCESS_KEY_ID, safe=''), urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=''))
+BROKER_URL = "sqs://{}:{}@".format(urllib.parse.quote(
+    AWS_ACCESS_KEY_ID, safe=''), urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=''))
 
 BROKER_TRANSPORT_OPTIONS = {
     'region': 'us-east-1',
