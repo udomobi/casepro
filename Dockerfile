@@ -7,6 +7,14 @@ RUN apk add --no-cache varnish wget gettext git
 RUN apk add --no-cache jpeg-dev zlib-dev
 RUN apk add --no-cache postgresql-dev nodejs nodejs-npm
 RUN apk add --no-cache supervisor
+RUN apk add --no-cache libcurl
+
+ENV PYCURL_SSL_LIBRARY=openssl
+
+RUN apk add --no-cache --virtual .build-deps build-base curl-dev \
+    && pip install influxdb pycurl pycryptodomex \
+    && apk del --no-cache --purge .build-deps \
+    && rm -rf /var/cache/apk/*
 
 COPY varnish.default.vcl /etc/varnish/default.vcl
 COPY pip-freeze.txt .
