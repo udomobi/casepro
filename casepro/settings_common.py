@@ -130,6 +130,8 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = "4-rr2sa6c#5*vr^2$m*2*j+5tc9duo2q+5e!xra%n($d5a$yp)"
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -140,6 +142,7 @@ MIDDLEWARE = (
     "dash.orgs.middleware.SetOrgMiddleware",
     "casepro.utils.middleware.JSONMiddleware",
     "casepro.profiles.middleware.ForcePasswordChangeMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 )
 
 ROOT_URLCONF = "casepro.urls"
@@ -344,6 +347,7 @@ GROUP_PERMISSIONS = {
         "cases.case_update",
         "cases.case_list",
         "cases.case_replies",
+        "cases.case_upload",
         "cases.caseexport_create",
         "cases.caseexport_read",
         "cases.partner_list",
@@ -380,6 +384,7 @@ GROUP_PERMISSIONS = {
         "cases.case_update",
         "cases.case_list",
         "cases.case_replies",
+        "cases.case_upload",
         "cases.caseexport_create",
         "cases.caseexport_read",
         "cases.partner_list",

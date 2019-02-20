@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *~
 
+.env
 sitestatic/
 config
 db/
@@ -13,7 +14,6 @@ celerybeat-schedule
 src/
 node_modules/
 
-casepro/settings.py
 casepro/settings.py.prod
 casepro/settings.py.staging
 fabfile.py
