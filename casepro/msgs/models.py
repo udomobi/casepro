@@ -341,7 +341,7 @@ class Message(models.Model):
 
     inserted_on = models.DateTimeField(auto_now_add=True)
 
-    modified_on = models.DateTimeField(null=True, help_text="When message was last modified")
+    modified_on = models.DateTimeField(null=True, help_text="When message was last modified", auto_now=True)
 
     is_handled = models.BooleanField(default=False)
 
