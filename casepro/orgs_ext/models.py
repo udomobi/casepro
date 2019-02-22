@@ -1,12 +1,9 @@
 import json
 
-from dash.orgs.models import Org, OrgBackend
+from dash.orgs.models import Org
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from celery import signature
 
 ORG_CACHE_TTL = 60 * 60 * 24 * 7  # 1 week
 ORG_CONFIG_BANNER_TEXT = "banner_text"
