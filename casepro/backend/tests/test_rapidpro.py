@@ -226,6 +226,7 @@ class MessageSyncerTest(BaseCasesTest):
                 "is_flagged": True,
                 "is_archived": False,
                 "created_on": d1,
+                "inserted_on": kwargs['inserted_on'],
                 "__data__contact": ("C-001", "Ann"),
                 "__data__labels": [("L-001", "Spam")],
             },
