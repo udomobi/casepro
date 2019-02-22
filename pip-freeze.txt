@@ -51,7 +51,7 @@ pyflakes==1.6.0           # via flake8
 python-dateutil==2.7.3
 python-decouple==3.1
 pytz==2018.5              # via celery, django, django-timezone-field, rapidpro-python, smartmin
-rapidpro-dash==1.4
+-e git+https://github.com/Ilhasoft/dash.git@fix/orgs-tasks#egg=dash
 rapidpro-python==2.4
 raven==6.9.0
 rcssmin==1.0.6            # via django-compressor
@@ -63,9 +63,8 @@ rjsmin==1.0.12            # via django-compressor
 sentry-sdk==0.7.2
 short-url==1.2.2
 six==1.11.0               # via django-hamlpy, django-rosetta, python-dateutil, rapidpro-python, responses
-smartmin==2.0.0
+smartmin==2.1.2
 sorl-thumbnail==12.4.1
-SQLAlchemy==1.2.18
 sqlparse==0.2.4           # via smartmin
 urllib3==1.23             # via requests
 vine==1.1.4               # via amqp
