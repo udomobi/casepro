@@ -287,7 +287,7 @@ PERMISSIONS = {
     "msgs.messageexport": ("create", "read"),
     "msgs.outgoing": ("search", "search_replies"),
     "msgs.replyexport": ("create", "read"),
-    "cases.case": ("create", "read", "update", "list"),
+    "cases.case": ("create", "read", "update", "list", "upload"),
     "case.caseexport": ("create", "read"),
     "cases.partner": ("create", "read", "delete", "list"),
     "contacts.contact": ("read", "list"),
