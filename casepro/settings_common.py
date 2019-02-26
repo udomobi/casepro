@@ -287,7 +287,7 @@ PERMISSIONS = {
     "msgs.messageexport": ("create", "read"),
     "msgs.outgoing": ("search", "search_replies"),
     "msgs.replyexport": ("create", "read"),
-    "cases.case": ("create", "read", "update", "list"),
+    "cases.case": ("create", "read", "update", "list", "upload"),
     "case.caseexport": ("create", "read"),
     "cases.partner": ("create", "read", "delete", "list"),
     "contacts.contact": ("read", "list"),
@@ -421,18 +421,18 @@ CELERY_RESULT_BACKEND = None  # task results are stored internally
 CELERYBEAT_SCHEDULE = {
     "message-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=20),
-        "args": ("casepro.msgs.tasks.pull_messages", "sync"),
+        "schedule": timedelta(seconds=30),
+        "args": ("casepro.msgs.tasks.pull_messages", "message-pull", "sync"),
     },
     "contact-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
         "schedule": timedelta(minutes=3),
-        "args": ("casepro.contacts.tasks.pull_contacts", "sync"),
+        "args": ("casepro.contacts.tasks.pull_contacts", "contact-pull", "sync"),
     },
     "message-handle": {
         "task": "dash.orgs.tasks.trigger_org_task",
         "schedule": timedelta(seconds=5),
-        "args": ("casepro.msgs.tasks.handle_messages", "sync"),
+        "args": ("casepro.msgs.tasks.handle_messages", "message-handle", "sync"),
     },
     "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
     "send-notifications": {"task": "casepro.profiles.tasks.send_notifications", "schedule": timedelta(minutes=1)},
@@ -470,6 +470,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("casepro.api.support.AdministratorPermission",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.CursorPagination",
     "PAGE_SIZE": 100,
+    "VIEW_NAME_FUNCTION": "casepro.api.support.get_view_name",
 }
 
 # AWS S3

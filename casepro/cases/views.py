@@ -358,11 +358,11 @@ class CaseCRUDL(SmartCRUDL):
             self.get_object().unwatch(request.user)
             return HttpResponse(status=204)
 
-    class Upload(OrgObjPermsMixin, SmartCreateView):
+    class Upload(OrgPermsMixin, SmartCreateView):
         """
         Endpoint for upload file to Amazon S3
         """
-        permission = "cases.case_read"
+        permission = "cases.case_upload"
 
         def post(self, request, *args, **kwargs):
             import uuid
