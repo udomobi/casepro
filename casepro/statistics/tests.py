@@ -3,10 +3,14 @@ from datetime import date, datetime, time
 
 import pytz
 from dash.orgs.models import Org
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils import timezone
 from unittest.mock import patch
+
+from xlwt import Workbook
 
 from casepro.cases.models import Case
 from casepro.msgs.models import Outgoing
@@ -274,7 +278,9 @@ class DailyCountsTest(BaseStatsTest):
 
 class DailyCountExportTest(BaseStatsTest):
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_label_export(self):
+    @patch('django.core.files.storage.default_storage.save')
+    @patch('django.core.files.storage.default_storage.open')
+    def test_label_export(self, open_mock, save_mock):
         url = reverse("statistics.dailycountexport_create")
 
         self.new_messages(date(2016, 1, 1), 1)  # Jan 1st
@@ -290,10 +296,21 @@ class DailyCountExportTest(BaseStatsTest):
 
         self.login(self.admin)
 
+        save_mock.side_effect = lambda name, content, max_length=None: name
         response = self.url_post_json("unicef", url, {"type": "L", "after": "2016-01-01", "before": "2016-01-31"})
         self.assertEqual(response.status_code, 200)
 
         export = DailyCountExport.objects.get()
+        temp = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_file(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(temp)
+            temp.flush()
+            return File(temp)
+
+        open_mock.side_effect = temp_file
         workbook = self.openWorkbook(export.filename)
         sheet = workbook.sheets()[0]
 
@@ -304,7 +321,9 @@ class DailyCountExportTest(BaseStatsTest):
         self.assertExcelRow(sheet, 31, [date(2016, 1, 31), 0, 0, 0])
 
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_partner_export(self):
+    @patch('django.core.files.storage.default_storage.save')
+    @patch('django.core.files.storage.default_storage.open')
+    def test_partner_export(self, open_mock, save_mock):
         url = reverse("statistics.dailycountexport_create")
 
         tz = pytz.timezone("Africa/Kampala")
@@ -326,10 +345,21 @@ class DailyCountExportTest(BaseStatsTest):
 
         self.login(self.admin)
 
+        save_mock.side_effect = lambda name, content, max_length=None: name
         response = self.url_post_json("unicef", url, {"type": "P", "after": "2016-01-01", "before": "2016-01-31"})
         self.assertEqual(response.status_code, 200)
 
         export = DailyCountExport.objects.get()
+        temp = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_file(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(temp)
+            temp.flush()
+            return File(temp)
+
+        open_mock.side_effect = temp_file
         workbook = self.openWorkbook(export.filename)
         (replies_sheet, ave_reply_sheet, ave_closed_sheet, cases_opened_sheet, cases_closed_sheet) = workbook.sheets()
 
@@ -355,7 +385,9 @@ class DailyCountExportTest(BaseStatsTest):
         self.assertExcelRow(cases_closed_sheet, 15, [d2, 0, 0], tz=tz)
 
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_user_export(self):
+    @patch('django.core.files.storage.default_storage.save')
+    @patch('django.core.files.storage.default_storage.open')
+    def test_user_export(self, open_mock, save_mock):
         url = reverse("statistics.dailycountexport_create")
 
         tz = pytz.timezone("Africa/Kampala")
@@ -377,10 +409,21 @@ class DailyCountExportTest(BaseStatsTest):
 
         self.login(self.admin)
 
+        save_mock.side_effect = lambda name, content, max_length=None: name
         response = self.url_post_json("unicef", url, {"type": "U", "after": "2016-01-01", "before": "2016-01-31"})
         self.assertEqual(response.status_code, 200)
 
         export = DailyCountExport.objects.get()
+        temp = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_file(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(temp)
+            temp.flush()
+            return File(temp)
+
+        open_mock.side_effect = temp_file
         workbook = self.openWorkbook(export.filename)
         (replies_sheet, cases_opened_sheet, cases_closed_sheet) = workbook.sheets()
 
