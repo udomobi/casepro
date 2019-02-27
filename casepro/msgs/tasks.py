@@ -128,7 +128,9 @@ def faq_csv_import(org, task_id):  # pragma: no cover
     task.save()
 
     try:
-        with transaction.atomic() and open(task.csv_file.path) as csv_file:  # transaction prevents partial csv import
+        with transaction.atomic() and task.csv_file as csv_file:  # transaction prevents partial csv import
+            if csv_file.closed:
+                csv_file.open('r')
             # Load csv into Dict
             records = csv.DictReader(csv_file)
             lines = 0
