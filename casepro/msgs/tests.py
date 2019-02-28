@@ -752,8 +752,20 @@ class FaqImportTest(BaseCasesTest):
         # importtask = self.create_importtask(self.admin, 'faq_good_import.csv')
         self.login(self.admin)
 
+        def temp_file(fname, mode=None):
+            class FakeFile:
+                def __init__(self):
+                    self.file = SimpleUploadedFile("faq_good_import.csv", faq_good_import)
+
+                def read(self, *args, **kwargs):
+                    return self.file.read(*args, **kwargs).decode('utf8')
+
+                def close(self):
+                    self.file.close()
+            return FakeFile()
+
         save_mock.side_effect = lambda name, content, max_length=None: name
-        open_mock.side_effect = lambda name, mode='r': open(path.join(settings.MEDIA_ROOT, name), mode)
+        open_mock.side_effect = temp_file
         with SimpleUploadedFile("faq_good_import.csv", faq_good_import) as csv_file:
             self.url_post("unicef", reverse("msgs.faq_import"), {"csv_file": csv_file})
 
