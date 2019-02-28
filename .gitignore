@@ -14,6 +14,7 @@ celerybeat-schedule
 src/
 node_modules/
 
+casepro/settings.py
 casepro/settings.py.staging
 fabfile.py
 fabconfig.py
@@ -47,7 +48,6 @@ var/
 media
 !media/test_orgs
 !media/csv_imports
-!/media/test_imports/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
