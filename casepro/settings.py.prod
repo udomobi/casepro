@@ -22,7 +22,6 @@ SEND_EMAILS = config('SEND_EMAILS', default=True, cast=bool)
 
 DEFAULT_FROM_EMAIL = config(
     'DEFAULT_FROM_EMAIL', default='webmaster@localhost')
-SERVER_EMAIL = config('SERVER_EMAIL')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
@@ -33,10 +32,9 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 ADMINS = config('ADMINS',
                 default='',
                 cast=lambda v: [
-                    (
-                        s.strip().split('|')[0],
-                        s.strip().split('|')[1],
-                    ) for s in v.split(',')] if v else [])
+                    tuple(s.strip().split('|'))
+                    for s in v.split(',')
+                ] if v else [])
 
 HOSTNAME = config('HOSTNAME', default='inbox.push.al')
 SITE_API_HOST = config('SITE_API_HOST', default='https://push.ilhasoft.mobi/')
@@ -51,6 +49,7 @@ DATABASES = {}
 DATABASES['default'] = dj_database_url.parse(
     config(
         'DEFAULT_DATABASE'))
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 REDIS_HOST = config('REDIS_HOST')
 REDIS_DATABASE = config('REDIS_DATABASE')
@@ -72,8 +71,7 @@ sentry_sdk.init(
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='', cast=str)
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='', cast=str)
-AWS_STORAGE_BUCKET_NAME = config(
-    'AWS_STORAGE_BUCKET_NAME', default='', cast=str)
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='', cast=str)
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
@@ -97,13 +95,13 @@ CELERY_ALWAYS_EAGER = config('CELERY_ALWAYS_EAGER', default=False, cast=bool)
 CELERY_RESULT_BACKEND = None
 CELERY_RESULT_PERSISTENT = False
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 COMPRESS_ENABLED = config('COMPRESS_ENABLED', default=True, cast=bool)
 COMPRESS_OFFLINE = config('COMPRESS_OFFLINE', default=True, cast=bool)
 
-COMPRESS_CSS_FILTERS = [
-    'compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
+COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter',
+                        'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
 TIME_ZONE = config('TIME_ZONE', default='UTC')

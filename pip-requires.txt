@@ -1,6 +1,6 @@
 ############## Django ##############
 
-django<2.1
+django<2.2
 djangorestframework
 django-celery-email
 django-compressor
@@ -15,7 +15,7 @@ smartmin
 
 ############## Misc ##############
 
-boto
+boto3
 celery
 colorama
 -e git+https://github.com/nyaruka/confmodel.git@python3#egg=confmodel

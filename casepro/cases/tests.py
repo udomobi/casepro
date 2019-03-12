@@ -4,11 +4,14 @@ from importlib import reload
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.urls import reverse
 from django.test.utils import modify_settings, override_settings
 from django.utils import timezone
 from unittest.mock import patch
 from temba_client.utils import format_iso8601
+from xlwt import Workbook
 
 from casepro.contacts.models import Contact
 from casepro.msgs.models import Label, Message, Outgoing
@@ -1130,7 +1133,9 @@ class CaseCRUDLTest(BaseCasesTest):
 
 class CaseExportCRUDLTest(BaseCasesTest):
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_create_and_read(self):
+    @patch('django.core.files.storage.default_storage.save')
+    @patch('django.core.files.storage.default_storage.open')
+    def test_create_and_read(self, open_mock, save_mock):
         ann = self.create_contact(
             self.unicef, "C-001", "Ann", fields={"nickname": "Annie", "age": "28", "state": "WA"}
         )
@@ -1164,6 +1169,15 @@ class CaseExportCRUDLTest(BaseCasesTest):
 
         export = CaseExport.objects.get()
         self.assertEqual(export.created_by, self.user1)
+        xls = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_xls(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(xls)
+            xls.flush()
+            return File(xls)
+        open_mock.side_effect = temp_xls
 
         workbook = self.openWorkbook(export.filename)
         sheet = workbook.sheets()[0]
@@ -1212,7 +1226,9 @@ class CaseExportCRUDLTest(BaseCasesTest):
         self.assertEqual(response.status_code, 302)
 
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_create_with_no_initial_message(self):
+    @patch('django.core.files.storage.default_storage.save')
+    @patch('django.core.files.storage.default_storage.open')
+    def test_create_with_no_initial_message(self, open_mock, save_mock):
         """When a case is exported with initial_message=None, the field should be a blank string."""
         ann = self.create_contact(self.unicef, "C-001", "Ann")
         case = self.create_case(self.unicef, ann, self.moh, None, [self.aids], summary="What is HIV?")
@@ -1221,6 +1237,16 @@ class CaseExportCRUDLTest(BaseCasesTest):
         self.url_post("unicef", "%s?folder=open" % reverse("cases.caseexport_create"))
 
         export = CaseExport.objects.get()
+        xls = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_xls(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(xls)
+            xls.flush()
+            return File(xls)
+        open_mock.side_effect = temp_xls
+
         workbook = self.openWorkbook(export.filename)
         sheet = workbook.sheets()[0]
 

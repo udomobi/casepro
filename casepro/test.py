@@ -1,11 +1,14 @@
 import json
-from datetime import date, datetime, time
-
 import pytz
+
+from datetime import date, datetime, time
+from mmap import mmap
+
 from dash.orgs.models import Org
 from dash.test import DashTest
 from django.conf import settings
 from django.core import mail
+from django.core.files.storage import default_storage
 from django.utils.timezone import now
 from xlrd import open_workbook, xldate_as_tuple
 from xlrd.sheet import XL_CELL_DATE
@@ -198,7 +201,10 @@ class BaseCasesTest(DashTest):
         self.assertEqual(len(mock.mock_calls), 0, "Expected no calls, called %d times" % len(mock.mock_calls))
 
     def openWorkbook(self, filename):
-        return open_workbook("%s/%s" % (settings.MEDIA_ROOT, filename), "rb")
+        return open_workbook(
+            filename=filename,
+            file_contents=mmap(default_storage.open(filename).fileno(), 0)
+        )
 
     def assertExcelRow(self, sheet, row_num, values, tz=None):
         """

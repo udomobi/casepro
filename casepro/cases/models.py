@@ -283,18 +283,14 @@ class Case(models.Model):
                 user_assignee=user_assignee,
             )
 
-            def update_message_case(_message, _case):
-                _case.labels.add(*list(_message.labels.all()))  # copy labels from message to new case
-
-                # attach message to this case
-                _message.case = _case
-                _message.save(update_fields=("case",))
-
+            # update the active messages's case, including the current message, from contacts and add their labels
+            # to the current case
             if message:
-                update_message_case(message, case)
-
-            for _message in messages:
-                update_message_case(_message, case)
+                messages = contact.incoming_messages.filter(Q(is_archived=False) | Q(pk=message.pk))
+            else:
+                messages = contact.incoming_messages.filter(is_archived=False)
+            messages.filter(~Q(case=case)).update(case=case)
+            case.labels.add(*Label.objects.filter(messages__in=messages))
 
             case.is_new = True
             case.watchers.add(user)

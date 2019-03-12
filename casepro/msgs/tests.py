@@ -1,13 +1,18 @@
-from datetime import datetime
-
 import pytz
+from datetime import datetime
+from os import path
+
 from dash.orgs.models import TaskState
+from django.conf import settings
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils.timezone import now
 from unittest.mock import call, patch
 from temba_client.utils import format_iso8601
+from xlwt import Workbook
 
 from casepro.contacts.models import Contact
 from casepro.msgs.views import ImportTask
@@ -729,7 +734,9 @@ class FaqImportTest(BaseCasesTest):
         )
         return task
 
-    def test_good_imports(self):
+    @patch('django.core.files.storage.default_storage.open')
+    @patch('django.core.files.storage.default_storage.save')
+    def test_good_imports(self, save_mock, open_mock):
         # store situation before import
         num_faqs = FAQ.objects.all().count()
         num_faqs_translations = FAQ.objects.filter(parent__isnull=False).count()
@@ -744,6 +751,21 @@ class FaqImportTest(BaseCasesTest):
         # create the importtask object
         # importtask = self.create_importtask(self.admin, 'faq_good_import.csv')
         self.login(self.admin)
+
+        def temp_file(fname, mode=None):
+            class FakeFile:
+                def __init__(self):
+                    self.file = SimpleUploadedFile("faq_good_import.csv", faq_good_import)
+
+                def read(self, *args, **kwargs):
+                    return self.file.read(*args, **kwargs).decode('utf8')
+
+                def close(self):
+                    self.file.close()
+            return FakeFile()
+
+        save_mock.side_effect = lambda name, content, max_length=None: name
+        open_mock.side_effect = temp_file
         with SimpleUploadedFile("faq_good_import.csv", faq_good_import) as csv_file:
             self.url_post("unicef", reverse("msgs.faq_import"), {"csv_file": csv_file})
 
@@ -779,7 +801,8 @@ class FaqImportTest(BaseCasesTest):
             num_faqs_parents_have_translations + 0 + 0,
         )
 
-    def test_bad_imports(self):
+    @patch('django.core.files.storage.default_storage.open')
+    def test_bad_imports(self, open_mock):
         # store situation before import
         num_faqs = FAQ.objects.all().count()
         num_faqs_translations = FAQ.objects.filter(parent__isnull=False).count()
@@ -791,6 +814,7 @@ class FaqImportTest(BaseCasesTest):
             FAQ.objects.filter(parent__isnull=True).exclude(translations__isnull=False).count()
         )
 
+        open_mock.side_effect = lambda name, mode='r': open(path.join(settings.MEDIA_ROOT, name), mode)
         # Import problem: labels don't match existing labels
         # create the importtask object
         importtask = self.create_importtask(self.admin, "faq_bad_import_labels.csv")
@@ -1521,7 +1545,9 @@ class MessageCRUDLTest(BaseCasesTest):
 
 class MessageExportCRUDLTest(BaseCasesTest):
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_create_and_read(self):
+    @patch('casepro.utils.export.default_storage.save')
+    @patch('casepro.test.default_storage.open')
+    def test_create_and_read(self, open_mock, save_mock):
         ann = self.create_contact(
             self.unicef, "C-001", "Ann", fields={"nickname": "Annie", "age": "28", "state": "WA"}
         )
@@ -1552,6 +1578,15 @@ class MessageExportCRUDLTest(BaseCasesTest):
         self.assertEqual(export.org, self.unicef)
         self.assertEqual(export.partner, self.moh)
         self.assertEqual(export.created_by, self.user1)
+        xls = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_xls(fname, modo=None):
+            book = Workbook()
+            export.render_book(book)
+            book.save(xls)
+            xls.flush()
+            return File(xls)
+        open_mock.side_effect = temp_xls
 
         workbook = self.openWorkbook(export.filename)
         sheet = workbook.sheets()[0]
@@ -1857,7 +1892,9 @@ class OutgoingCRUDLTest(BaseCasesTest):
 
 class ReplyExportCRUDLTest(BaseCasesTest):
     @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True, BROKER_BACKEND="memory")
-    def test_create_and_read(self):
+    @patch('casepro.utils.export.default_storage.save')
+    @patch('casepro.test.default_storage.open')
+    def test_create_and_read(self, open_mock, save_mock):
         ann = self.create_contact(
             self.unicef, "C-001", "Ann", fields={"nickname": "Annie", "age": "28", "state": "WA"}
         )
@@ -1892,6 +1929,15 @@ class ReplyExportCRUDLTest(BaseCasesTest):
         self.assertEqual(response.status_code, 200)
 
         export = ReplyExport.objects.get(created_by=self.admin)
+        xls = NamedTemporaryFile(mode='rb+', delete=True)
+
+        def temp_xls(fname):
+            book = Workbook()
+            export.render_book(book)
+            book.save(xls)
+            xls.flush()
+            return File(xls)
+        open_mock.side_effect = temp_xls
 
         workbook = self.openWorkbook(export.filename)
         sheet = workbook.sheets()[0]

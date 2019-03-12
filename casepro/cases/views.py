@@ -1,9 +1,11 @@
+import uuid
 from datetime import timedelta
 
 from dash.orgs.models import Org, TaskState
 from dash.orgs.views import OrgObjPermsMixin, OrgPermsMixin
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
@@ -26,6 +28,7 @@ from temba_client.utils import parse_iso8601
 from casepro.contacts.models import Contact, Field
 from casepro.msgs.models import Label, Message, MessageFolder, OutgoingFolder
 from casepro.pods import registry as pod_registry
+from casepro.short_urls.models import Urls
 from casepro.statistics.models import DailyCount, DailySecondTotalCount
 from casepro.utils import (
     JSONEncoder,
@@ -330,7 +333,8 @@ class CaseCRUDL(SmartCRUDL):
             timeline = self.object.get_timeline(after, before, merge_from_backend) if not empty else []
 
             context["timeline"] = timeline
-            context["max_time"] = datetime_to_microseconds(dt_now) - 180000000  # -3 minutes
+            # TODO: Check if will be necessary subtract 3 minutes
+            context["max_time"] = datetime_to_microseconds(dt_now)  # - timedelta(minutes=3)
             return context
 
         def render_to_response(self, context, **response_kwargs):
@@ -365,28 +369,17 @@ class CaseCRUDL(SmartCRUDL):
         permission = "cases.case_upload"
 
         def post(self, request, *args, **kwargs):
-            import uuid
-            from boto.s3.connection import S3Connection
-            from boto.s3.key import Key
-            from casepro.short_urls.models import Urls
-
             upload = self.request.FILES.get("file")
             if upload:
                 if upload.size > 20971520:  # 20MB
                     return HttpResponse(_('File too large. Maximum is 20MB.'), status=400)
 
-                connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-                bucket = connection.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
-
                 extension = str(upload.name).lower().split(".")[-1]
-                file_uuid = uuid.uuid4()
-                key = Key(bucket, '{}/{}.{}'.format(self.request.org.subdomain, file_uuid, extension))
+                key = f'{self.request.org.subdomain}/{uuid.uuid4()}.{extension}'
 
-                if key.set_contents_from_file(upload):
-                    key.make_public()
-                    short_url = Urls.create(self.org, key.generate_url(expires_in=0, query_auth=False))
+                if default_storage.bucket.upload_fileobj(upload, key, ExtraArgs={'ACL': 'public-read'}):
+                    short_url = Urls.create(self.org, default_storage.url(key, expire=0))
                     return HttpResponse(short_url, status=200)
-
             return HttpResponse(status=204)
 
 
