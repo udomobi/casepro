@@ -130,6 +130,8 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = "4-rr2sa6c#5*vr^2$m*2*j+5tc9duo2q+5e!xra%n($d5a$yp)"
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -140,6 +142,7 @@ MIDDLEWARE = (
     "dash.orgs.middleware.SetOrgMiddleware",
     "casepro.utils.middleware.JSONMiddleware",
     "casepro.profiles.middleware.ForcePasswordChangeMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 )
 
 ROOT_URLCONF = "casepro.urls"
@@ -284,7 +287,7 @@ PERMISSIONS = {
     "msgs.messageexport": ("create", "read"),
     "msgs.outgoing": ("search", "search_replies"),
     "msgs.replyexport": ("create", "read"),
-    "cases.case": ("create", "read", "update", "list"),
+    "cases.case": ("create", "read", "update", "list", "upload"),
     "case.caseexport": ("create", "read"),
     "cases.partner": ("create", "read", "delete", "list"),
     "contacts.contact": ("read", "list"),
@@ -344,6 +347,7 @@ GROUP_PERMISSIONS = {
         "cases.case_update",
         "cases.case_list",
         "cases.case_replies",
+        "cases.case_upload",
         "cases.caseexport_create",
         "cases.caseexport_read",
         "cases.partner_list",
@@ -380,6 +384,7 @@ GROUP_PERMISSIONS = {
         "cases.case_update",
         "cases.case_list",
         "cases.case_replies",
+        "cases.case_upload",
         "cases.caseexport_create",
         "cases.caseexport_read",
         "cases.partner_list",
@@ -416,18 +421,18 @@ CELERY_RESULT_BACKEND = None  # task results are stored internally
 CELERYBEAT_SCHEDULE = {
     "message-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=20),
-        "args": ("casepro.msgs.tasks.pull_messages", "sync"),
+        "schedule": timedelta(seconds=30),
+        "args": ("casepro.msgs.tasks.pull_messages", "message-pull", "sync"),
     },
     "contact-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
         "schedule": timedelta(minutes=3),
-        "args": ("casepro.contacts.tasks.pull_contacts", "sync"),
+        "args": ("casepro.contacts.tasks.pull_contacts", "contact-pull", "sync"),
     },
     "message-handle": {
         "task": "dash.orgs.tasks.trigger_org_task",
         "schedule": timedelta(seconds=5),
-        "args": ("casepro.msgs.tasks.handle_messages", "sync"),
+        "args": ("casepro.msgs.tasks.handle_messages", "message-handle", "sync"),
     },
     "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
     "send-notifications": {"task": "casepro.profiles.tasks.send_notifications", "schedule": timedelta(minutes=1)},

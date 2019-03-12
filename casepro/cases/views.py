@@ -358,11 +358,11 @@ class CaseCRUDL(SmartCRUDL):
             self.get_object().unwatch(request.user)
             return HttpResponse(status=204)
 
-    class Upload(OrgObjPermsMixin, SmartCreateView):
+    class Upload(OrgPermsMixin, SmartCreateView):
         """
         Endpoint for upload file to Amazon S3
         """
-        permission = "cases.case_read"
+        permission = "cases.case_upload"
 
         def post(self, request, *args, **kwargs):
             import uuid
@@ -375,8 +375,8 @@ class CaseCRUDL(SmartCRUDL):
                 if upload.size > 20971520:  # 20MB
                     return HttpResponse(_('File too large. Maximum is 20MB.'), status=400)
 
-                connection = S3Connection(settings.AWS_ACCESS_KEY, settings.AWS_SECRET_ACCESS_KEY)
-                bucket = connection.get_bucket(settings.AWS_S3_BUCKET)
+                connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+                bucket = connection.get_bucket(settings.AWS_STORAGE_BUCKET_NAME)
 
                 extension = str(upload.name).lower().split(".")[-1]
                 file_uuid = uuid.uuid4()
