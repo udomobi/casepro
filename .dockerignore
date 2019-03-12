@@ -1,0 +1,11 @@
+.vscode/
+env/
+__pycache__/
+staticfiles/
+.DS_Store
+*.py[cod]
+settings.ini
+db.sqlite3
+node_modules/
+.pyenv-*/
+sitestatic/
