@@ -426,12 +426,12 @@ CELERYBEAT_SCHEDULE = {
     },
     "contact-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(minutes=3),
+        "schedule": timedelta(minutes=1),
         "args": ("casepro.contacts.tasks.pull_contacts", "contact-pull", "sync"),
     },
     "message-handle": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=5),
+        "schedule": timedelta(seconds=30),
         "args": ("casepro.msgs.tasks.handle_messages", "message-handle", "sync"),
     },
     "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
