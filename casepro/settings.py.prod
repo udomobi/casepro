@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import urllib
 import dj_database_url
 import sentry_sdk
 
@@ -15,17 +14,19 @@ from casepro.settings_common import *  # noqa
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [
-                       s.strip() for s in v.split(',')])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS',
+                       default='*',
+                       cast=lambda v: [
+                           s.strip() for s in v.split(',')])
 
 SEND_EMAILS = config('SEND_EMAILS', default=True, cast=bool)
 
 DEFAULT_FROM_EMAIL = config(
     'DEFAULT_FROM_EMAIL', default='webmaster@localhost')
-EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_HOST = config('EMAIL_HOST', default='localhost')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='user@localhost')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='password')
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
 
@@ -48,11 +49,11 @@ SITE_BACKEND = 'casepro.backend.rapidpro.RapidProBackend'
 DATABASES = {}
 DATABASES['default'] = dj_database_url.parse(
     config(
-        'DEFAULT_DATABASE'))
+        'DEFAULT_DATABASE', default='postgres://inbox:inbox@database:5432/inbox'))
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
-REDIS_HOST = config('REDIS_HOST')
-REDIS_DATABASE = config('REDIS_DATABASE')
+REDIS_HOST = config('REDIS_HOST', default='redis')
+REDIS_DATABASE = config('REDIS_DATABASE', default='11')
 
 CACHES = {
     'default': {
@@ -71,21 +72,15 @@ sentry_sdk.init(
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='', cast=str)
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='', cast=str)
-AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='', cast=str)
+AWS_STORAGE_BUCKET_NAME = config(
+    'AWS_STORAGE_BUCKET_NAME', default='', cast=str)
 
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = ''
 
-BROKER_URL = "sqs://{}:{}@".format(urllib.parse.quote(
-    AWS_ACCESS_KEY_ID, safe=''), urllib.parse.quote(AWS_SECRET_ACCESS_KEY, safe=''))
-
-BROKER_TRANSPORT_OPTIONS = {
-    'region': 'us-east-1',
-    'polling_interval': 20,
-    'visibility_timeout': 3600,
-    'queue_name_prefix': 'inbox-'
-}
+BROKER_URL = config('CELERY_BROKER_URL',
+                    default='redis://{}:6379/{}'.format(REDIS_HOST, REDIS_DATABASE))
 
 CELERY_ACCEPT_CONTENT = ['application/json', 'application/x-python-serialize']
 CELERY_RESULT_SERIALIZER = 'json'

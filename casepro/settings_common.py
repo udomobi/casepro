@@ -421,7 +421,7 @@ CELERY_RESULT_BACKEND = None  # task results are stored internally
 CELERYBEAT_SCHEDULE = {
     "message-pull": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=30),
+        "schedule": timedelta(minutes=1),
         "args": ("casepro.msgs.tasks.pull_messages", "message-pull", "sync"),
     },
     "contact-pull": {
@@ -431,7 +431,7 @@ CELERYBEAT_SCHEDULE = {
     },
     "message-handle": {
         "task": "dash.orgs.tasks.trigger_org_task",
-        "schedule": timedelta(seconds=5),
+        "schedule": timedelta(minutes=1),
         "args": ("casepro.msgs.tasks.handle_messages", "message-handle", "sync"),
     },
     "squash-counts": {"task": "casepro.statistics.tasks.squash_counts", "schedule": timedelta(minutes=5)},
